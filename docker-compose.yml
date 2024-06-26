@@ -93,6 +93,26 @@ networks:
 
 # services
 services:
+  rdesktop:
+    image: lscr.io/linuxserver/rdesktop:ubuntu-xfce
+    container_name: rdesktop
+    networks:
+      guacnetwork_compose:
+    #security_opt:
+    #  - seccomp:unconfined #optional
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    #volumes:
+    #  - /var/run/docker.sock:/var/run/docker.sock #optional
+    #  - /path/to/rdesktop/data:/config #optional
+    #ports:
+    #  - 3399:3389
+    #devices:
+    #  - /dev/dri:/dev/dri #optional
+    shm_size: "1gb" #optional
+    restart: unless-stopped
   # guacd
   guacd:
     container_name: guacd_compose
@@ -134,6 +154,7 @@ services:
     image: guacamole/guacamole
     links:
     - guacd
+    - rdesktop
     networks:
       guacnetwork_compose:
     ports:
@@ -154,7 +175,7 @@ services:
    - ./nginx/ssl/self.cert:/etc/nginx/ssl/self.cert:ro
    - ./nginx/ssl/self-ssl.key:/etc/nginx/ssl/self-ssl.key:ro
    ports:
-   - 8443:443
+   - 443:443
    links:
    - guacamole
    networks:
